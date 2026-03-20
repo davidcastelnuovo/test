@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-tint": "#50652a",
+              "inverse-primary": "#b6d088",
+              "on-primary-fixed": "#131f00",
+              "tertiary-fixed": "#ffdcc2",
+              "on-secondary-fixed": "#221b04",
+              "on-secondary-container": "#6f6345",
+              "inverse-surface": "#31312b",
+              "surface-variant": "#e5e2da",
+              "outline": "#7c766b",
+              "on-tertiary-fixed-variant": "#6d3a00",
+              "surface-container-high": "#ebe8e0",
+              "surface-dim": "#dcdad2",
+              "secondary-fixed-dim": "#d4c5a1",
+              "error": "#ba1a1a",
+              "secondary-container": "#f1e1bb",
+              "surface-container-highest": "#e5e2da",
+              "primary": "#50652a",
+              "secondary-fixed": "#f1e1bb",
+              "outline-variant": "#cdc6b9",
+              "surface-container": "#f1eee6",
+              "surface-bright": "#fcf9f1",
+              "on-secondary-fixed-variant": "#50462a",
+              "inverse-on-surface": "#f3f1e9",
+              "surface": "#fcf9f1",
+              "secondary": "#695d40",
+              "surface-container-low": "#f6f3eb",
+              "primary-container": "#afc882",
+              "on-primary-container": "#3f541b",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#b6d088",
+              "on-primary-fixed-variant": "#394d14",
+              "on-background": "#1c1c17",
+              "tertiary-fixed-dim": "#ffb77b",
+              "on-surface": "#1c1c17",
+              "tertiary-container": "#feae68",
+              "on-tertiary-fixed": "#2e1500",
+              "tertiary": "#8c4f10",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-surface-variant": "#4b463c",
+              "on-error": "#ffffff",
+              "primary-fixed": "#d2eca2",
+              "on-secondary": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-tertiary-container": "#774000",
+              "error-container": "#ffdad6",
+              "background": "#fcf9f1"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(28, 28, 23, 0.4), rgba(28, 28, 23, 0.1));
+        }
+        .glass-nav {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-stone-50/70 dark:bg-stone-900/70 backdrop-blur-xl shadow-sm dark:shadow-none transition-all duration-300 ease-in-out">
+<div class="flex justify-between items-center px-8 py-6 max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-2">
+<span class="text-2xl font-serif italic text-olive-900 dark:text-olive-100 font-headline tracking-tight">The Sacred Sanctuary</span>
+</div>
+<div class="hidden md:flex items-center gap-10 font-serif tracking-tight text-on-surface">
+<a class="text-olive-900 dark:text-olive-50 border-b-2 border-olive-800 dark:border-olive-200 pb-1" href="#">Rooms</a>
+<a class="text-stone-600 dark:text-stone-400 hover:text-olive-800 dark:hover:text-olive-200 transition-colors" href="#">Gallery</a>
+<a class="text-stone-600 dark:text-stone-400 hover:text-olive-800 dark:hover:text-olive-200 transition-colors" href="#">Contact</a>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-md font-medium hover:bg-opacity-90 transition-all shadow-sm">
+                Book Now
+            </button>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="relative h-screen w-full overflow-hidden flex items-center justify-center">
+<div class="absolute inset-0 z-0">
+<img alt="Jerusalem Old City View" class="w-full h-full object-cover" data-alt="Golden sunset over Jerusalem Old City stone arches" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhT-1s9dcxpZYeBMQyrNrg5Lm9xCkynOWUZ-8alwd1psgPiJ62A5hfeKiEkJCKSqM79S4wwO8RlUwk3pltOmLqZUzA39DqQyi8BP1eyMMWVSuMJoHQSiloSYxFrRMDKxPu9rx88c8uBciAU4-VlkseNiL9SPA8d2BH3rcl6M0A9iHfqEbXXX-6oylwXIsgYxeFjlbM-x2j4MZ1m5aqLCL64ttIvzq8FOceKniPFzcgA3OPGdeX9gSw94fkpYlad2yhbPthoFGRYuCu"/>
+<div class="absolute inset-0 bg-black/30 hero-gradient"></div>
+</div>
+<div class="relative z-10 text-center px-6 max-w-4xl">
+<span class="text-white/90 font-label font-bold tracking-[0.3em] text-sm uppercase mb-6 block">Yerushalayim Shel Zahav</span>
+<h1 class="font-headline text-5xl md:text-7xl text-white mb-8 leading-tight tracking-tight">
+                Find Peace in the Heart of History
+            </h1>
+<p class="text-white/80 text-lg md:text-xl font-light mb-12 max-w-2xl mx-auto leading-relaxed">
+                Experience the soulful elegance of the Jewish Quarter within a meticulously restored heritage sanctuary.
+            </p>
+<div class="flex flex-col md:flex-row gap-4 justify-center">
+<button class="bg-primary hover:bg-primary-container hover:text-on-primary-container text-on-primary px-10 py-4 rounded-md text-lg transition-all duration-300">
+                    Explore Suites
+                </button>
+</div>
+</div>
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+<span class="material-symbols-outlined text-white text-3xl">expand_more</span>
+</div>
+</section>
+<!-- Welcome Section (Asymmetric Editorial) -->
+<section class="py-24 md:py-32 px-6 bg-surface">
+<div class="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+<div class="md:col-span-7 relative">
+<div class="rounded-xl overflow-hidden shadow-xl aspect-[4/3]">
+<img alt="Jerusalem Stone Interior" class="w-full h-full object-cover" data-alt="Luxury room with authentic ancient Jerusalem stone walls" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcTzLhK5uP4YJfC1qo7OFqRxx-UknNLdbI_qiLPpP3WUgaIRVU_-sQdxuNZoDpbHalsD3FQZN7JOoUn0DFG5DbJZomGPZjnSkM21sIQkM_7felUd4_7r14nmEWNAPMQhrf46CSwWZh4uTptabjuTaewmOkzLveblFuewcDSFkdN5_bsAG0vxFWfLcMvOkf4FAV3D1rAxyZfGOOKS26V4bVnS7iUf5KiYS095-1mtmzoB2NnMDs85pr3H2EBm5uWkjhBYgQSzbUhuBJ"/>
+</div>
+<!-- Heritage Overlay Signature Component -->
+<div class="absolute -bottom-8 -right-4 md:right-8 bg-surface/70 backdrop-blur-xl p-8 rounded-xl shadow-2xl max-w-xs hidden sm:block">
+<p class="font-headline italic text-tertiary text-lg mb-2">Authenticity &amp; Soul</p>
+<p class="text-sm text-on-surface-variant leading-relaxed">Every stone in our walls tells a story spanning three millennia of history.</p>
+</div>
+</div>
+<div class="md:col-span-5 md:pl-12">
+<h2 class="font-headline text-4xl md:text-5xl text-on-surface mb-8 leading-tight">A Sanctuary Carved from Memory</h2>
+<div class="space-y-6 text-on-surface-variant leading-relaxed text-lg">
+<p>Welcome to The Sacred Sanctuary, where the ancient echoes of the Old City meet contemporary refinement. Located in the heart of the Jewish Quarter, our guest house is an intimate retreat designed for the discerning traveler.</p>
+<p>Each room preserves the original 18th-century masonry, paired with handcrafted furniture and the soft glow of Jerusalem's legendary light.</p>
+</div>
+<div class="mt-12 flex items-center gap-4 text-primary font-bold">
+<span class="w-12 h-[1px] bg-primary"></span>
+<span class="tracking-widest uppercase text-sm">Our Heritage</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-screen-2xl mx-auto px-6">
+<div class="text-center mb-20">
+<h2 class="font-headline text-3xl md:text-4xl mb-4">The Jerusalem Experience</h2>
+<div class="w-20 h-1 bg-tertiary mx-auto opacity-40"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<div class="text-tertiary mb-6">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">temple_hindu</span>
+</div>
+<h3 class="font-headline text-2xl mb-4">Steps from the Western Wall</h3>
+<p class="text-on-surface-variant leading-relaxed">Experience the spiritual heart of the world just a three-minute stroll from our front door through the historic alleyways.</p>
+</div>
+<!-- Feature 2 -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<div class="text-tertiary mb-6">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">foundation</span>
+</div>
+<h3 class="font-headline text-2xl mb-4">Authentic Jerusalem Stone</h3>
+<p class="text-on-surface-variant leading-relaxed">Hand-carved limestone interiors that maintain a perfect natural temperature and a timeless, serene atmosphere.</p>
+</div>
+<!-- Feature 3 -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<div class="text-tertiary mb-6">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+</div>
+<h3 class="font-headline text-2xl mb-4">Modern Comfort &amp; Luxury</h3>
+<p class="text-on-surface-variant leading-relaxed">Premium linens, artisanal amenities, and state-of-the-art climate control hidden within ancient architecture.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Gallery Section (Asymmetric Layout) -->
+<section class="py-24 bg-surface overflow-hidden">
+<div class="max-w-screen-2xl mx-auto px-6">
+<div class="flex justify-between items-end mb-16">
+<div>
+<h2 class="font-headline text-4xl mb-2">Curated Moments</h2>
+<p class="text-on-surface-variant">A glimpse into the quiet beauty of our sanctuary.</p>
+</div>
+<button class="text-primary font-bold flex items-center gap-2 hover:gap-4 transition-all">
+                    View Full Gallery <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-12 gap-6 h-[700px]">
+<div class="col-span-12 md:col-span-5 h-full">
+<img alt="Jerusalem Alleyway" class="w-full h-full object-cover rounded-xl shadow-lg" data-alt="Quiet stone alleyway in the Jewish Quarter of Jerusalem" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6dCnoTBm-tPQVgLQRnB0QeV6cQOv31AzhpuaykNBCzosj7fxSO-DZv2cGQcv9cC4Il9jqBAfMqkBghOo83m-XTM9htX5X788I6WMPE5B1Jg5HjeZBghmVW0ptyKFizs5LkIUvczc3cOKCAEReOeylTms5xqn1qIf2Icn4G_DYRWX0BjgXxLIjEs5hO8EQ8NjuDwb7y7A6ZYtyWRTwOxcJfnXEPMBn49E9_1BGy0qLwkFjyASW7jnfUuqQ7UuCfRXV_EUUBpZpq477"/>
+</div>
+<div class="col-span-12 md:col-span-7 flex flex-col gap-6">
+<div class="h-1/2">
+<img alt="Interior Detail" class="w-full h-full object-cover rounded-xl shadow-lg" data-alt="Detail of high-end bedding and stone arch architectural feature" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1yfSNJdjgxWq7OoWE4wBm_oLt4W6jSBcsOKHMxwYyYfpqE49F-cs1EKlrSptoyHnLnJRJQH2f7kjC3A0KETxLUtNbp4MHffDFXGK9gclYewwbZSWWRIvx6dC_FVVOBOtbyLJMmPpqMA8eVZCRH0_QIG-ZnNQ_VjBBIWa4x-IazJycjX-o4clGD50tMPZQxxVNhoAm1fljVG5EgGEicIP6vRDeweK3eC7zS35xprc_meRlcv_pv4ERPxf1nbOZJr5oZ24AmrdfC9Rt"/>
+</div>
+<div class="h-1/2 grid grid-cols-2 gap-6">
+<img alt="Dining Area" class="w-full h-full object-cover rounded-xl shadow-lg" data-alt="Minimalist luxury breakfast area with warm golden lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEDo5PuIXtvURgvpOPUhaPErZIibsLe6yVSpKsuyfH5VFapKFNlAMcYnhiJxpzQiswwGK_T3_Iq4jNviPlCDYEKoqV8wTX73Ta96EwkVBeaERqZakmn1hn6krLlTy8mrwwT2p7maWKPpz50JnY97QluhxIMxZsl4aBJHtvE9oVdk4oB-RRfgcj2rjBOxqeLGarKCif4nD4y5NKfLEr4hdgv8hTltZ_KjQtYOLyyZ9te8ov6R06lh-l86pfU0eHZanjQ_u0BUxKS0Nc"/>
+<img alt="Guest Experience" class="w-full h-full object-cover rounded-xl shadow-lg" data-alt="Artisanal olive oil and fresh bread on a stone table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMLDpHdMCOEzQf0eTeEBxXyv9J_17-4USJbS0tjLE7ufLyBHjeu08NTLeap6cIpwwKJHgexKwVVjtSj7T1BeMVMzlM8HZPinTd-8sIEBdYBQdoOUPP4n_JDWZv4lxcsH41_Pdy-3ATVtYPXqePNq0bjMBk0a19FIRMmLSKbCuWOur_Lpov6wln7ILW1OoijbLn6Et4vVdUPp2qTRbwU5_9ES2dJXZWDUYhBgnTicQ78-pYnICEaqLXhEFnA6cnJ5m66xk2bXQMScwH"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Booking CTA Section -->
+<section class="py-24 md:py-32 bg-surface-container">
+<div class="max-w-4xl mx-auto px-6">
+<div class="bg-surface-container-lowest rounded-xl shadow-2xl p-10 md:p-16 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full"></div>
+<div class="relative z-10 text-center">
+<h2 class="font-headline text-4xl mb-4">Secure Your Stay</h2>
+<p class="text-on-surface-variant mb-12 max-w-md mx-auto">Join us for an unforgettable journey into the heart of Jerusalem. Limited suites available for the upcoming season.</p>
+<form class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+<div class="flex flex-col text-left">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 ml-1">Check In</label>
+<input class="bg-surface-container-high border-none rounded-sm p-4 text-on-surface focus:ring-2 focus:ring-primary/20" type="date"/>
+</div>
+<div class="flex flex-col text-left">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 ml-1">Guests</label>
+<select class="bg-surface-container-high border-none rounded-sm p-4 text-on-surface focus:ring-2 focus:ring-primary/20">
+<option>2 Adults</option>
+<option>1 Adult</option>
+<option>3 Adults</option>
+</select>
+</div>
+<div class="flex items-end">
+<button class="w-full bg-primary text-on-primary py-4 rounded-md font-bold hover:bg-surface-tint transition-colors shadow-lg shadow-primary/20" type="submit">
+                                Check Availability
+                            </button>
+</div>
+</form>
+<p class="text-sm text-tertiary font-medium">Boutique rates from $340 / night</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full border-t border-stone-200/20 bg-stone-100 dark:bg-stone-950">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-16 gap-8 max-w-screen-2xl mx-auto">
+<div class="flex flex-col items-center md:items-start gap-4">
+<span class="font-serif text-xl text-stone-900 dark:text-stone-100">The Sacred Sanctuary</span>
+<p class="font-sans text-sm tracking-wide leading-relaxed text-stone-500 dark:text-stone-400 text-center md:text-left">
+                    © 2024 The Sacred Sanctuary Jerusalem. All rights reserved.
+                </p>
+</div>
+<div class="flex gap-10">
+<a class="text-stone-500 dark:text-stone-400 hover:text-olive-600 dark:hover:text-olive-400 transition-colors font-sans text-sm tracking-wide" href="#">Location</a>
+<a class="text-stone-500 dark:text-stone-400 hover:text-olive-600 dark:hover:text-olive-400 transition-colors font-sans text-sm tracking-wide" href="#">Instagram</a>
+<a class="text-stone-500 dark:text-stone-400 hover:text-olive-600 dark:hover:text-olive-400 transition-colors font-sans text-sm tracking-wide" href="#">Facebook</a>
+</div>
+</div>
+</footer>
+</body></html>
