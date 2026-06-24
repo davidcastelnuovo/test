@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>עוזר · עברית</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- מסך התחברות -->
+  <div id="auth" class="auth-overlay hidden">
+    <form id="auth-form" class="auth-card">
+      <h1>התחברות</h1>
+      <p class="muted">היכנס או הירשם כדי להתחיל</p>
+      <input id="email" type="email" placeholder="אימייל" autocomplete="email" required />
+      <input id="password" type="password" placeholder="סיסמה" autocomplete="current-password" required />
+      <div class="auth-actions">
+        <button id="login-btn" type="submit">כניסה</button>
+        <button id="signup-btn" type="button" class="secondary">הרשמה</button>
+      </div>
+      <div id="auth-error" class="auth-error"></div>
+    </form>
+  </div>
+
+  <!-- האפליקציה -->
+  <div id="layout" class="hidden">
+    <aside id="sidebar">
+      <button id="new-chat" class="new-chat-btn">+ שיחה חדשה</button>
+      <div class="sidebar-title">היסטוריה</div>
+      <div id="conversations" class="sessions"></div>
+      <div class="sidebar-footer">
+        <span id="user-email" class="muted"></span>
+        <button id="logout" class="link-btn">התנתק</button>
+      </div>
+    </aside>
+
+    <div id="app">
+      <header>
+        <div class="brand">
+          <button id="toggle-sidebar" class="icon-btn" title="היסטוריה">☰</button>
+          <span class="dot"></span>
+          <h1>עוזר</h1>
+        </div>
+      </header>
+
+      <main id="messages">
+        <div class="welcome">
+          <h2>שלום 👋</h2>
+          <p>זהו הבסיס של העוזר — התחברות, שיחות והודעות נשמרים ב-Supabase.</p>
+          <p class="muted">🔧 הסוכן (ה-AI) עדיין לא מחובר — נוסיף אותו בשלב הבא.</p>
+        </div>
+      </main>
+
+      <footer>
+        <form id="composer">
+          <textarea id="input" rows="1" placeholder="כתוב הודעה… (Enter לשליחה)" autofocus></textarea>
+          <button id="send" type="submit">שלח</button>
+        </form>
+        <div class="hint">השלב הזה שומר הודעות בלבד. תשובת ה-AI תתווסף כשנחבר את הסוכן.</div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

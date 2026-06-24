@@ -1,0 +1,5 @@
+# סודות/קונפיג מקומי — לא לקומיט
+public/config.js
+.env
+.vercel
+node_modules
