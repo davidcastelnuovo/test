@@ -1,0 +1,205 @@
+:root {
+  --bg: #faf9f6;
+  --panel: #ffffff;
+  --border: #e7e3da;
+  --text: #1f1d1a;
+  --muted: #8a857c;
+  --accent: #c96442;
+  --accent-soft: #f5e9e4;
+  --user-bg: #eef1f5;
+  --code-bg: #1e1e2e;
+  --code-text: #e4e4e7;
+  --tool-bg: #f3f1ec;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: "Segoe UI", "Heebo", "Assistant", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 900px;
+  margin: 0 auto;
+  border-inline: 1px solid var(--border);
+  background: var(--bg);
+}
+
+/* ── כותרת ── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand h1 { font-size: 17px; margin: 0; font-weight: 600; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.header-controls { display: flex; gap: 8px; align-items: center; }
+#model {
+  padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg); font-family: inherit; font-size: 13px; cursor: pointer;
+}
+#new-chat {
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg); cursor: pointer; font-family: inherit; font-size: 13px;
+}
+#new-chat:hover { background: var(--accent-soft); }
+
+/* ── אזור ההודעות ── */
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.welcome { text-align: center; margin: auto; color: var(--muted); max-width: 480px; }
+.welcome h2 { color: var(--text); }
+.muted { color: var(--muted); font-size: 13px; }
+
+.msg { display: flex; flex-direction: column; gap: 4px; max-width: 100%; }
+.msg .who { font-size: 12px; color: var(--muted); font-weight: 600; }
+.bubble {
+  padding: 12px 16px;
+  border-radius: 14px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+.msg.user { align-items: flex-start; }
+.msg.user .bubble { background: var(--user-bg); border-top-right-radius: 4px; }
+.msg.assistant .bubble { background: var(--panel); border: 1px solid var(--border); border-top-right-radius: 4px; }
+
+/* בלוקי קוד — תמיד שמאל-לימין */
+.bubble pre, .bubble code {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: plaintext;
+}
+.bubble pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 12px 14px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 13px;
+  margin: 8px 0;
+}
+.bubble code:not(pre code) {
+  background: var(--tool-bg);
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 0.9em;
+  direction: ltr;
+  display: inline-block;
+}
+
+/* ── כרטיסי כלים ── */
+.tool {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--tool-bg);
+  margin: 6px 0;
+  font-size: 13px;
+  overflow: hidden;
+}
+.tool-head {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  user-select: none;
+}
+.tool-head .icon { font-size: 15px; }
+.tool-head .name { font-family: "Fira Code", monospace; color: var(--accent); }
+.tool-body {
+  padding: 0 12px 10px;
+  direction: ltr;
+  text-align: left;
+}
+.tool-body pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 10px 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 12px;
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.tool.collapsed .tool-body { display: none; }
+
+/* ── מחוון הקלדה ── */
+.typing { display: inline-block; }
+.typing::after {
+  content: "▍";
+  animation: blink 1s steps(2) infinite;
+  color: var(--accent);
+}
+@keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+/* ── תחתית / תיבת קלט ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 12px 18px;
+  background: var(--panel);
+}
+#composer {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+#input {
+  flex: 1;
+  resize: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  max-height: 200px;
+  background: var(--bg);
+  color: var(--text);
+}
+#input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+#send {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#send:hover { background: #b5563a; }
+#send:disabled { opacity: 0.5; cursor: default; }
+.hint { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+.error-box {
+  background: #fdecec;
+  border: 1px solid #e5a0a0;
+  color: #a22222;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+}
