@@ -40,8 +40,11 @@
       </main>
 
       <footer>
+        <div id="attachments" class="attachments"></div>
         <form id="composer">
-          <textarea id="input" rows="1" placeholder="כתוב הודעה… (Enter לשליחה, Shift+Enter לשורה חדשה)" autofocus></textarea>
+          <button id="attach" type="button" class="icon-btn attach-btn" title="צרף קובץ">📎</button>
+          <input type="file" id="file-input" multiple hidden />
+          <textarea id="input" rows="1" placeholder="כתוב הודעה… (Enter לשליחה, Shift+Enter לשורה חדשה. אפשר גם להדביק או לגרור קובץ)" autofocus></textarea>
           <button id="send" type="submit" title="שלח">שלח</button>
         </form>
         <div class="hint">הכלים פועלים על המחשב שמריץ את השרת. הרץ רק פקודות שאתה סומך עליהן.</div>

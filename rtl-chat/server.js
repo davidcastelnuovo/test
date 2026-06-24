@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { query, listSessions, getSessionMessages, deleteSession } from '@anthropic-ai/claude-agent-sdk';
+import { query, listSessions, getSessionMessages, deleteSession, renameSession } from '@anthropic-ai/claude-agent-sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -185,6 +185,17 @@ app.get('/api/sessions/:id/messages', async (req, res) => {
       }
     }
     res.json({ items });
+  } catch (err) {
+    res.status(500).json({ error: err?.message || String(err) });
+  }
+});
+
+app.patch('/api/sessions/:id', async (req, res) => {
+  try {
+    const title = String(req.body?.title || '').trim();
+    if (!title) return res.status(400).json({ error: 'כותרת ריקה' });
+    await renameSession(req.params.id, title, { dir: WORKDIR });
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err?.message || String(err) });
   }

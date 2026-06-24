@@ -2,6 +2,8 @@
 let sessionId = null;       // מזהה ה-session של ה-SDK — שומר הקשר בין סבבים
 let busy = false;
 let currentAbort = null;    // AbortController של הבקשה הפעילה (לעצירה)
+let attachments = [];       // קבצים מצורפים: {name, content}
+const MAX_ATTACH_BYTES = 500 * 1024;
 
 const $ = (s) => document.querySelector(s);
 const messagesEl = $('#messages');
@@ -78,13 +80,29 @@ function addToolCard(id, name) {
   messagesEl.appendChild(card);
   scrollToBottom();
   const body = card.querySelector('.tool-body');
-  if (id) toolCards.set(id, { card, body });
-  return { card, body };
+  const entry = { card, body, name };
+  if (id) toolCards.set(id, entry);
+  return entry;
 }
 
 function setToolInput(entry, input) {
+  // עריכת קובץ — מציגים diff צבעוני במקום JSON גולמי
+  if (entry.name === 'Edit' && input && 'old_string' in input && 'new_string' in input) {
+    entry.body.innerHTML = renderEditDiff(input);
+    return;
+  }
   const pretty = JSON.stringify(input, null, 2);
   entry.body.innerHTML = `<div class="tool-label">קלט:</div><pre>${escapeHtml(pretty)}</pre>`;
+}
+
+function renderEditDiff(input) {
+  const oldLines = String(input.old_string ?? '').split('\n');
+  const newLines = String(input.new_string ?? '').split('\n');
+  let html = `<div class="tool-label">עריכה: ${escapeHtml(input.file_path || '')}</div><div class="diff">`;
+  for (const l of oldLines) html += `<div class="line del">- ${escapeHtml(l)}</div>`;
+  for (const l of newLines) html += `<div class="line add">+ ${escapeHtml(l)}</div>`;
+  html += `</div>`;
+  return html;
 }
 function setToolResult(entry, result, isError) {
   const out = String(result || '');
@@ -122,10 +140,26 @@ function setBusy(on) {
 
 // ── שליחת הודעה והזרמת התשובה ───────────────────────────────────────────────
 async function sendMessage(text) {
-  if (!text.trim()) return;
+  if (!text.trim() && attachments.length === 0) return;
   setBusy(true);
 
-  addMessage('user').textContent = text;
+  // בונים את ההצגה ואת ה-prompt בפועל (כולל קבצים מצורפים)
+  const userBubble = addMessage('user');
+  userBubble.textContent = text;
+  let prompt = text;
+  if (attachments.length) {
+    const note = document.createElement('div');
+    note.className = 'muted';
+    note.style.cssText = 'font-size:12px;margin-top:6px';
+    note.textContent = '📎 ' + attachments.map((a) => a.name).join(', ');
+    userBubble.appendChild(note);
+    const blocks = attachments
+      .map((a) => `קובץ מצורף — ${a.name}:\n\`\`\`\n${a.content}\n\`\`\``)
+      .join('\n\n');
+    prompt = blocks + (text ? '\n\n' + text : '');
+    attachments = [];
+    renderAttachments();
+  }
 
   let assistantBubble = null;
   let assistantText = '';
@@ -143,7 +177,7 @@ async function sendMessage(text) {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ prompt: text, model: modelEl.value, sessionId }),
+      body: JSON.stringify({ prompt, model: modelEl.value, sessionId }),
       signal: currentAbort.signal,
     });
 
@@ -235,8 +269,9 @@ async function loadSessions() {
     for (const s of list) {
       const item = document.createElement('div');
       item.className = 'session-item' + (s.id === sessionId ? ' active' : '');
-      item.innerHTML = `<span class="stitle">${escapeHtml(s.title)}</span><button class="del" title="מחק">🗑</button>`;
+      item.innerHTML = `<span class="stitle">${escapeHtml(s.title)}</span><button class="rename" title="שנה שם">✎</button><button class="del" title="מחק">🗑</button>`;
       item.querySelector('.stitle').addEventListener('click', () => openSession(s.id));
+      item.querySelector('.rename').addEventListener('click', (e) => { e.stopPropagation(); renameSessionPrompt(s.id, s.title); });
       item.querySelector('.del').addEventListener('click', (e) => { e.stopPropagation(); deleteSession(s.id); });
       sessionsEl.appendChild(item);
     }
@@ -263,6 +298,49 @@ async function deleteSession(id) {
     if (id === sessionId) startNewChat();
     loadSessions();
   } catch { /* התעלם */ }
+}
+
+async function renameSessionPrompt(id, current) {
+  const title = window.prompt('שם חדש לשיחה:', current || '');
+  if (!title || !title.trim()) return;
+  try {
+    await fetch(`/api/sessions/${id}`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ title: title.trim() }),
+    });
+    loadSessions();
+  } catch (err) {
+    showError('שינוי השם נכשל: ' + err.message);
+  }
+}
+
+// ── קבצים מצורפים ────────────────────────────────────────────────────────────
+function renderAttachments() {
+  const el = $('#attachments');
+  el.innerHTML = '';
+  attachments.forEach((a, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.innerHTML = `📄 ${escapeHtml(a.name)} <span class="x" title="הסר">✕</span>`;
+    chip.querySelector('.x').addEventListener('click', () => { attachments.splice(i, 1); renderAttachments(); });
+    el.appendChild(chip);
+  });
+}
+
+function addFiles(fileList) {
+  for (const file of fileList) {
+    if (file.size > MAX_ATTACH_BYTES) {
+      showError(`הקובץ "${file.name}" גדול מדי (מקסימום ${Math.round(MAX_ATTACH_BYTES / 1024)}KB).`);
+      continue;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      attachments.push({ name: file.name, content: String(reader.result || '') });
+      renderAttachments();
+    };
+    reader.readAsText(file);
+  }
 }
 
 // רנדור של שיחה שמורה מהפורמט השטוח שהשרת מחזיר
@@ -320,3 +398,21 @@ inputEl.addEventListener('input', () => {
 
 $('#new-chat').addEventListener('click', () => { if (!busy) startNewChat(); });
 $('#toggle-sidebar').addEventListener('click', () => $('#sidebar').classList.toggle('hidden'));
+
+// צירוף קבצים: כפתור, בחירה, הדבקה, וגרירה
+$('#attach').addEventListener('click', () => $('#file-input').click());
+$('#file-input').addEventListener('change', (e) => { addFiles(e.target.files); e.target.value = ''; });
+
+inputEl.addEventListener('paste', (e) => {
+  const files = [...(e.clipboardData?.files || [])];
+  if (files.length) { e.preventDefault(); addFiles(files); }
+});
+
+['dragover', 'dragleave', 'drop'].forEach((type) => {
+  formEl.addEventListener(type, (e) => {
+    e.preventDefault();
+    if (type === 'dragover') formEl.classList.add('dragover');
+    else formEl.classList.remove('dragover');
+    if (type === 'drop' && e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files);
+  });
+});

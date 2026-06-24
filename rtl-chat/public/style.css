@@ -78,6 +78,12 @@ html, body {
 }
 .session-item:hover .del { opacity: 1; }
 .session-item .del:hover { color: #c0392b; }
+.session-item .rename {
+  opacity: 0; border: none; background: none; cursor: pointer; color: var(--muted);
+  font-size: 13px; padding: 0 2px; flex-shrink: 0;
+}
+.session-item:hover .rename { opacity: 1; }
+.session-item .rename:hover { color: var(--accent); }
 
 #app {
   display: flex;
@@ -275,6 +281,27 @@ footer {
 #send.stop { background: #555; }
 #send.stop:hover { background: #333; }
 .hint { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: center; }
+.attach-btn { font-size: 20px; align-self: flex-end; padding: 8px 6px; }
+#composer.dragover { outline: 2px dashed var(--accent); outline-offset: 4px; border-radius: 12px; }
+
+/* ── צ'יפים של קבצים מצורפים ── */
+.attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.attachments:empty { display: none; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent-soft); border: 1px solid var(--border);
+  border-radius: 8px; padding: 4px 8px; font-size: 12px;
+}
+.chip .x { cursor: pointer; color: var(--muted); font-weight: 700; }
+.chip .x:hover { color: #c0392b; }
+
+/* ── הצגת diff בעריכת קובץ ── */
+.diff { direction: ltr; text-align: left; font-family: "Fira Code", monospace; font-size: 12px;
+  background: var(--code-bg); border-radius: 8px; padding: 8px 0; margin-top: 6px; overflow-x: auto; }
+.diff .line { padding: 0 12px; white-space: pre-wrap; word-break: break-all; }
+.diff .add { background: rgba(80, 200, 120, 0.18); color: #b6f0c4; }
+.diff .del { background: rgba(220, 80, 80, 0.18); color: #f3b6b6; }
+.diff .ctx { color: #9a99a8; }
 
 .error-box {
   background: #fdecec;
