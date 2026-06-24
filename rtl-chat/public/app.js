@@ -1,5 +1,5 @@
 // ── מצב השיחה ──────────────────────────────────────────────────────────────
-let history = []; // הודעות בפורמט ה-API: {role, content}
+let sessionId = null; // מזהה ה-session של ה-SDK — שומר הקשר בין סבבים
 let busy = false;
 
 const $ = (s) => document.querySelector(s);
@@ -18,29 +18,18 @@ fetch('/api/config').then((r) => r.json()).then((cfg) => {
 }).catch(() => {});
 
 // ── עזרי תצוגה ───────────────────────────────────────────────────────────────
-function scrollToBottom() {
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+function scrollToBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+function clearWelcome() { const w = messagesEl.querySelector('.welcome'); if (w) w.remove(); }
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function clearWelcome() {
-  const w = messagesEl.querySelector('.welcome');
-  if (w) w.remove();
-}
-
-// המרת Markdown בסיסי ל-HTML (בלוקי קוד, inline code, מודגש)
+// המרת Markdown בסיסי ל-HTML
 function renderMarkdown(text) {
-  // escape
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-  // בלוקי קוד ```
-  html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (_m, _lang, code) => {
-    return `<pre><code>${code.replace(/\n$/, '')}</code></pre>`;
-  });
-  // inline code `...`
+  let html = escapeHtml(text);
+  html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (_m, _l, code) => `<pre><code>${code.replace(/\n$/, '')}</code></pre>`);
   html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-  // מודגש **...**
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   return html;
 }
@@ -71,24 +60,28 @@ function showError(msg) {
 }
 
 const toolIcons = {
-  bash: '⚡', read_file: '📖', write_file: '✏️', edit_file: '🔧', list_dir: '📁',
+  Bash: '⚡', Read: '📖', Write: '✏️', Edit: '🔧', Glob: '🔍', Grep: '🔎',
 };
 
-function addToolCard(name) {
+const toolCards = new Map(); // id -> {card, body}
+
+function addToolCard(id, name) {
   const card = document.createElement('div');
   card.className = 'tool collapsed';
   card.innerHTML = `
     <div class="tool-head">
       <span class="icon">${toolIcons[name] || '🛠️'}</span>
       <span>הרצת כלי:</span>
-      <span class="name">${name}</span>
+      <span class="name">${escapeHtml(name)}</span>
       <span style="margin-inline-start:auto;color:var(--muted)">▼</span>
     </div>
     <div class="tool-body"></div>`;
   card.querySelector('.tool-head').addEventListener('click', () => card.classList.toggle('collapsed'));
   messagesEl.appendChild(card);
   scrollToBottom();
-  return card;
+  const body = card.querySelector('.tool-body');
+  toolCards.set(id, { card, body });
+  return { card, body };
 }
 
 // ── שליחת הודעה והזרמת התשובה ───────────────────────────────────────────────
@@ -98,11 +91,9 @@ async function sendMessage(text) {
   sendBtn.disabled = true;
 
   addMessage('user').textContent = text;
-  history.push({ role: 'user', content: text });
 
   let assistantBubble = null;
   let assistantText = '';
-  let turnText = ''; // כל הטקסט של ה-assistant בסבב הזה (לשמירה בהיסטוריה)
   const ensureBubble = () => {
     if (!assistantBubble) {
       assistantBubble = addMessage('assistant');
@@ -115,7 +106,7 @@ async function sendMessage(text) {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ messages: history, model: modelEl.value }),
+      body: JSON.stringify({ prompt: text, model: modelEl.value, sessionId }),
     });
 
     const reader = res.body.getReader();
@@ -141,63 +132,64 @@ async function sendMessage(text) {
     showError('שגיאת תקשורת: ' + err.message);
   } finally {
     if (assistantBubble) assistantBubble.classList.remove('typing');
-    // שמירת תשובת Claude בהיסטוריה כדי לשמר הקשר בין סבבים
-    if (turnText.trim()) history.push({ role: 'assistant', content: turnText });
     busy = false;
     sendBtn.disabled = false;
     inputEl.focus();
   }
 
-  // ── טיפול באירוע בודד מה-stream ──
   function handleEvent(evt) {
     switch (evt.kind) {
+      case 'session':
+        sessionId = evt.sessionId;
+        break;
+
       case 'text': {
         assistantText += evt.text;
-        turnText += evt.text;
         const b = ensureBubble();
         b.innerHTML = renderMarkdown(assistantText);
         scrollToBottom();
         break;
       }
-      case 'tool_input': {
-        // סיים את בועת הטקסט הנוכחית (אם הייתה) ושמור אותה בהיסטוריה לוגית
+
+      case 'tool_start': {
+        // סיים בועת טקסט נוכחית — קריאת כלי מתחילה
         if (assistantBubble) {
           assistantBubble.classList.remove('typing');
           assistantBubble = null;
           assistantText = '';
         }
-        const card = addToolCard(evt.name);
-        const body = card.querySelector('.tool-body');
-        const pretty = JSON.stringify(evt.input, null, 2);
-        body.innerHTML = `<div style="color:var(--muted);font-size:11px;margin-bottom:4px">קלט:</div><pre>${escapeHtml(pretty)}</pre>`;
-        card._body = body;
-        currentToolCard = card;
+        addToolCard(evt.id, evt.name);
         break;
       }
+
+      case 'tool_input': {
+        const entry = toolCards.get(evt.id) || addToolCard(evt.id, evt.name);
+        const pretty = JSON.stringify(evt.input, null, 2);
+        entry.body.innerHTML = `<div class="tool-label">קלט:</div><pre>${escapeHtml(pretty)}</pre>`;
+        break;
+      }
+
       case 'tool_result': {
-        if (currentToolCard) {
-          const body = currentToolCard._body;
-          const out = String(evt.result);
+        const entry = toolCards.get(evt.id);
+        if (entry) {
+          const out = String(evt.result || '');
           const trimmed = out.length > 4000 ? out.slice(0, 4000) + '\n… (קוצר)' : out;
-          body.innerHTML += `<div style="color:var(--muted);font-size:11px;margin:8px 0 4px">פלט:</div><pre>${escapeHtml(trimmed)}</pre>`;
-          currentToolCard = null;
+          const label = evt.isError ? 'פלט (שגיאה):' : 'פלט:';
+          entry.body.innerHTML += `<div class="tool-label">${label}</div><pre>${escapeHtml(trimmed)}</pre>`;
+          if (evt.isError) entry.card.classList.add('tool-error');
         }
         scrollToBottom();
         break;
       }
+
       case 'done':
         break;
+
       case 'error':
         showError('שגיאה מהשרת: ' + evt.error);
         break;
     }
   }
-}
-
-let currentToolCard = null;
-
-function escapeHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // ── אירועי UI ────────────────────────────────────────────────────────────────
@@ -223,7 +215,8 @@ inputEl.addEventListener('input', () => {
 
 $('#new-chat').addEventListener('click', () => {
   if (busy) return;
-  history = [];
+  sessionId = null;
+  toolCards.clear();
   messagesEl.innerHTML = '';
   const w = document.createElement('div');
   w.className = 'welcome';

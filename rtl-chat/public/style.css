@@ -145,6 +145,8 @@ main {
   word-break: break-all;
 }
 .tool.collapsed .tool-body { display: none; }
+.tool-label { color: var(--muted); font-size: 11px; margin: 8px 0 4px; direction: rtl; text-align: right; }
+.tool.tool-error { border-color: #e5a0a0; }
 
 /* ── מחוון הקלדה ── */
 .typing { display: inline-block; }
