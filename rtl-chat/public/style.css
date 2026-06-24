@@ -22,15 +22,76 @@ html, body {
   color: var(--text);
 }
 
+#layout {
+  display: flex;
+  height: 100vh;
+  max-width: 1180px;
+  margin: 0 auto;
+  border-inline: 1px solid var(--border);
+}
+
+/* ── סרגל היסטוריה ── */
+#sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: #f3f1ec;
+  border-inline-start: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 10px;
+  overflow: hidden;
+}
+#sidebar.hidden { display: none; }
+.new-chat-btn {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.new-chat-btn:hover { background: var(--accent-soft); }
+.sidebar-title { font-size: 12px; color: var(--muted); font-weight: 600; padding: 4px 6px; }
+.sessions { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.session-item {
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.session-item:hover { background: var(--accent-soft); }
+.session-item.active { background: var(--accent-soft); font-weight: 600; }
+.session-item .stitle { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.session-item .del {
+  opacity: 0; border: none; background: none; cursor: pointer; color: var(--muted);
+  font-size: 15px; padding: 0 2px; flex-shrink: 0;
+}
+.session-item:hover .del { opacity: 1; }
+.session-item .del:hover { color: #c0392b; }
+
 #app {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  max-width: 900px;
-  margin: 0 auto;
-  border-inline: 1px solid var(--border);
+  flex: 1;
+  min-width: 0;
   background: var(--bg);
 }
+.icon-btn {
+  border: none; background: none; cursor: pointer; font-size: 18px;
+  color: var(--text); padding: 2px 6px; border-radius: 6px;
+}
+.icon-btn:hover { background: var(--accent-soft); }
 
 /* ── כותרת ── */
 header {
@@ -148,6 +209,22 @@ main {
 .tool-label { color: var(--muted); font-size: 11px; margin: 8px 0 4px; direction: rtl; text-align: right; }
 .tool.tool-error { border-color: #e5a0a0; }
 
+/* ── בלוק חשיבה ── */
+.thinking {
+  border-inline-start: 3px solid #c9bfae;
+  background: #f7f5f0;
+  border-radius: 8px;
+  margin: 6px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.thinking-head {
+  padding: 7px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  font-weight: 600; user-select: none;
+}
+.thinking-body { padding: 0 12px 10px; white-space: pre-wrap; line-height: 1.6; font-style: italic; }
+.thinking.collapsed .thinking-body { display: none; }
+
 /* ── מחוון הקלדה ── */
 .typing { display: inline-block; }
 .typing::after {
@@ -195,6 +272,8 @@ footer {
 }
 #send:hover { background: #b5563a; }
 #send:disabled { opacity: 0.5; cursor: default; }
+#send.stop { background: #555; }
+#send.stop:hover { background: #333; }
 .hint { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: center; }
 
 .error-box {

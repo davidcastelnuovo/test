@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { query } from '@anthropic-ai/claude-agent-sdk';
+import { query, listSessions, getSessionMessages, deleteSession } from '@anthropic-ai/claude-agent-sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -43,6 +43,17 @@ app.post('/api/chat', async (req, res) => {
   // מפה בין tool_use id לשם הכלי, כדי לשייך תוצאות לקריאות
   const toolNames = new Map();
 
+  // עצירה: אם הלקוח מתנתק (לחיצה על "עצור" מבטלת את ה-fetch) — נבטל את ה-query.
+  // משתמשים ב-res.on('close') ולא ב-req: האחרון נורה גם כשגוף הבקשה נקרא במלואו.
+  const abortController = new AbortController();
+  let aborted = false;
+  res.on('close', () => {
+    if (!res.writableEnded) {
+      aborted = true;
+      abortController.abort();
+    }
+  });
+
   try {
     const stream = query({
       prompt,
@@ -50,6 +61,7 @@ app.post('/api/chat', async (req, res) => {
         model: model || DEFAULT_MODEL,
         systemPrompt: SYSTEM_PROMPT,
         cwd: WORKDIR,
+        abortController,
         allowedTools: ALLOWED_TOOLS,
         // אישור אוטומטי של הכלים המורשים ללא אישור אינטראקטיבי.
         // עדיף על permissionMode:'bypassPermissions' כי הדגל --dangerously-skip-permissions
@@ -124,14 +136,67 @@ app.post('/api/chat', async (req, res) => {
       }
     }
   } catch (err) {
-    send({ kind: 'error', error: err?.message || String(err) });
+    // ביטול יזום (עצירה) אינו שגיאה אמיתית
+    if (!aborted) send({ kind: 'error', error: err?.message || String(err) });
   } finally {
-    res.end();
+    if (!res.writableEnded) res.end();
   }
 });
 
 app.get('/api/config', (_req, res) => {
   res.json({ defaultModel: DEFAULT_MODEL, workdir: WORKDIR, hasKey: !!API_KEY });
+});
+
+// ── היסטוריית שיחות (נשמרת ע"י ה-SDK כ-JSONL) ─────────────────────────────
+app.get('/api/sessions', async (_req, res) => {
+  try {
+    const sessions = await listSessions({ dir: WORKDIR, limit: 100 });
+    res.json(
+      sessions.map((s) => ({
+        id: s.sessionId,
+        title: s.customTitle || s.summary || s.firstPrompt || 'שיחה ללא כותרת',
+        lastModified: s.lastModified,
+      }))
+    );
+  } catch (err) {
+    res.status(500).json({ error: err?.message || String(err) });
+  }
+});
+
+// מחזיר את הודעות השיחה בפורמט שטוח שה-frontend יודע לרנדר
+app.get('/api/sessions/:id/messages', async (req, res) => {
+  try {
+    const msgs = await getSessionMessages(req.params.id, { dir: WORKDIR });
+    const items = [];
+    for (const m of msgs) {
+      const content = m.message?.content;
+      if (!Array.isArray(content)) continue;
+      for (const block of content) {
+        if (block.type === 'text' && m.type === 'user') items.push({ type: 'user', text: block.text });
+        else if (block.type === 'text' && m.type === 'assistant') items.push({ type: 'assistant', text: block.text });
+        else if (block.type === 'thinking') items.push({ type: 'thinking', text: block.thinking });
+        else if (block.type === 'tool_use') items.push({ type: 'tool_use', id: block.id, name: block.name, input: block.input });
+        else if (block.type === 'tool_result') {
+          const text = Array.isArray(block.content)
+            ? block.content.map((c) => (typeof c === 'string' ? c : c.text || '')).join('')
+            : String(block.content ?? '');
+          items.push({ type: 'tool_result', id: block.tool_use_id, result: text, isError: !!block.is_error });
+        }
+      }
+    }
+    res.json({ items });
+  } catch (err) {
+    res.status(500).json({ error: err?.message || String(err) });
+  }
+});
+
+app.delete('/api/sessions/:id', async (req, res) => {
+  try {
+    await deleteSession(req.params.id, { dir: WORKDIR });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err?.message || String(err) });
+  }
 });
 
 app.listen(PORT, () => {
