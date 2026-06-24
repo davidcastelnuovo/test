@@ -3,7 +3,14 @@ let sessionId = null;       // מזהה ה-session של ה-SDK — שומר הק
 let busy = false;
 let currentAbort = null;    // AbortController של הבקשה הפעילה (לעצירה)
 let attachments = [];       // קבצים מצורפים: {name, content}
+let totalCost = 0;          // עלות מצטברת לשיחה (USD)
 const MAX_ATTACH_BYTES = 500 * 1024;
+
+function renderCost() {
+  const el = $('#cost');
+  if (!el) return;
+  el.textContent = totalCost > 0 ? `💰 $${totalCost.toFixed(4)}` : '';
+}
 
 const $ = (s) => document.querySelector(s);
 const messagesEl = $('#messages');
@@ -254,7 +261,9 @@ async function sendMessage(text) {
         scrollToBottom();
         break;
       }
-      case 'done': break;
+      case 'done':
+        if (typeof evt.cost === 'number') { totalCost += evt.cost; renderCost(); }
+        break;
       case 'error': showError('שגיאה מהשרת: ' + evt.error); break;
     }
   }
@@ -284,6 +293,7 @@ async function openSession(id) {
     const { items } = await (await fetch(`/api/sessions/${id}/messages`)).json();
     sessionId = id;
     toolCards.clear();
+    totalCost = 0; renderCost();
     messagesEl.innerHTML = '';
     renderHistory(items || []);
     loadSessions();
@@ -367,6 +377,7 @@ function renderHistory(items) {
 function startNewChat() {
   sessionId = null;
   toolCards.clear();
+  totalCost = 0; renderCost();
   messagesEl.innerHTML = '';
   const w = document.createElement('div');
   w.className = 'welcome';

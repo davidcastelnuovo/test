@@ -17,6 +17,27 @@ if (!API_KEY) {
 }
 
 const app = express();
+
+// ── הגנת סיסמה אופציונלית (HTTP Basic) ─────────────────────────────────────
+// חובה לחשיפה ציבורית: האפליקציה מריצה פקודות על השרת. הגדר AUTH_USER ו-AUTH_PASS
+// בסביבה כדי להפעיל. ללא הגדרה — אין הגנה (מתאים רק להרצה מקומית).
+const AUTH_USER = process.env.AUTH_USER;
+const AUTH_PASS = process.env.AUTH_PASS;
+if (AUTH_USER && AUTH_PASS) {
+  app.use((req, res, next) => {
+    const [scheme, encoded] = (req.headers.authorization || '').split(' ');
+    if (scheme === 'Basic' && encoded) {
+      const [u, p] = Buffer.from(encoded, 'base64').toString().split(':');
+      if (u === AUTH_USER && p === AUTH_PASS) return next();
+    }
+    res.set('WWW-Authenticate', 'Basic realm="rtl-chat"');
+    return res.status(401).send('נדרש אימות');
+  });
+  console.log('🔒 הגנת סיסמה פעילה (AUTH_USER/AUTH_PASS)');
+} else {
+  console.log('⚠️  אין הגנת סיסמה — אל תחשוף לאינטרנט בלי להגדיר AUTH_USER ו-AUTH_PASS');
+}
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
